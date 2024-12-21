@@ -1,0 +1,58 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif  ;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
+    monospace;
+}
+
+.aboutus{
+  display: flex; 
+  justify-content: space-between; 
+  padding: 20px;
+}
+
+.leftcontent{
+  flex: 1; padding: 10px; background-color: #f2f2f2;
+}
+
+.rightcontent{
+  flex: 1; padding: 10px;
+}
+
+.aboutusimage{
+  height: 100%;
+}
+
+.button{
+  padding: 10px; background-color: #007bff; color: #fff; border: none; cursor: pointer;
+}
+
+.responsive-width{
+  width:1200px;
+}
+
+/* In your styles or tailwindcss styles */
+.input-field {
+  appearance: none;
+  outline: none;
+  border: 1px solid #A4A4A4; /* Change this color to your preference */
+  background-color: #F5F5F5; /* Change this color to your preference */
+  padding: 0.5rem;
+  width: 100%;
+  border-radius: 0.25rem;
+  margin-top: 0.5rem;
+}
+
+.input-field:focus {
+  border-color: #4D5455; /* Change this color to your preference */
+}
+

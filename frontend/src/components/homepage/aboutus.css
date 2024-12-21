@@ -1,0 +1,21 @@
+.aboutus{
+    display: flex; 
+    justify-content: space-between; 
+}
+
+.leftcontent{
+    flex: 1; padding: 100px; background-color: #f2f2f2;
+}
+
+.rightcontent{
+    flex: 1; padding: 100px;
+}
+
+.aboutusimage{
+    height: 70%;
+    width:70%;
+}
+
+.button{
+    padding: 10px; background-color: #007bff; color: #fff; border: none; cursor: pointer;
+}
