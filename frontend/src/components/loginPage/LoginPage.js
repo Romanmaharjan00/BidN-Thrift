@@ -1,18 +1,16 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import Navbar from "../common/navbar";
 import Footer from "../homepage/Footer";
 import { useForm } from "react-hook-form";
 import * as yup from "yup";
 import { yupResolver } from "@hookform/resolvers/yup";
-import { publicRequest } from "../../requestMethods";
-import { useNavigate, Redirect, Route } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { enqueueSnackbar } from "notistack";
-import { jwtDecode } from "jwt-decode";
+import { auth } from "../../firebase/firebase"; // Import Firebase auth
+import { signInWithEmailAndPassword } from "firebase/auth"; // Firebase auth method
 
 const LoginPage = () => {
-  const [isadmin, setIsAdmin] = useState();
-  const [userId, setUserId] = useState([]);
-  let decoded;
+  const [responseMessage, setResponseMessage] = useState(false);
   let navigate = useNavigate();
 
   const schema = yup
@@ -21,60 +19,36 @@ const LoginPage = () => {
       password: yup.string().required("Password is required"),
     })
     .required();
-    
+
   const {
     register,
     handleSubmit,
-    watch,
     formState: { errors },
   } = useForm({
     resolver: yupResolver(schema),
   });
-  const [responseMessage, setResponseMessage] = useState(false);
-  const [isChecked, setIsChecked] = useState(false);
-  const handleCheckboxChange = (event) => {
-    setIsChecked(event.target.checked);
+
+  const onSubmit = async (data) => {
+    try {
+      const userCredential = await signInWithEmailAndPassword(auth, data.email, data.password);
+      const user = userCredential.user;
+      enqueueSnackbar("Logged in successfully", { variant: "success" });
+      localStorage.setItem("token", user.accessToken);  // Store Firebase token
+
+      // Redirect based on user role
+      checkifAdmin(user);
+    } catch (error) {
+      setResponseMessage("Invalid email or password");
+      enqueueSnackbar(responseMessage, { variant: "error" });
+    }
   };
 
-  const onSubmit = (data) => {
-    publicRequest
-      .post("user/login", data)
-      .then((res) => {
-        setResponseMessage(false);
-        enqueueSnackbar("Logged in sucessfully", { variant: "success" });
-        localStorage.setItem("token", res?.data?.token);
-        const isTokenAvailable = res?.data?.token;
+  const checkifAdmin = (user) => {
+    // Here, you can implement checking the user's role based on Firestore or Firebase Realtime Database.
+    // Assuming you have a collection 'users' where user roles are stored.
+    // Use the `user` info (uid, email, etc.) to fetch data from Firestore.
 
-        if (isTokenAvailable) {
-          decoded = jwtDecode(isTokenAvailable);
-          console.log("this is decoded token,", decoded?.id);
-        }
-        checkifAdmin();
-      })
-      .catch((err) => {
-        setResponseMessage(err?.response?.data?.message);
-        console.log("err: ", err?.response?.data?.message);
-      });
-  };
-
-  const checkifAdmin = () => {
-    publicRequest
-      .get(`/user/${decoded?.id}`)
-      .then((res) => {
-        // console.log("this is user role:",res?.data?.role)
-        if (res?.data?.role === "admin") {
-          setIsAdmin(true);
-          console.log("entered");
-          navigate("/admin");
-        } else {
-          setIsAdmin(false);
-          navigate("/user");
-        }
-      })
-      .catch((err) => {
-        console.error("Error getting user", err);
-        setIsAdmin(false);
-      });
+    navigate("/user"); // Default navigation, can modify as per role
   };
 
   return (
@@ -130,20 +104,15 @@ const LoginPage = () => {
             </div>
 
             <a href="/forgotpassword">
-              <p className="cursor-pointer text-gray-400 pt-4">
-                Forgot password?
-              </p>
+              <p className="cursor-pointer text-gray-400 pt-4">Forgot password?</p>
             </a>
 
             <a href="/registrationpage">
-              <p className="cursor-pointer text-gray-400">
-                Don't have an account? Register here.
-              </p>
+              <p className="cursor-pointer text-gray-400">Don't have an account? Register here.</p>
             </a>
           </form>
         </div>
       </div>
-
       <Footer />
     </>
   );
